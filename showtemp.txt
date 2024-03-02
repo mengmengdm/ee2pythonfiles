@@ -1,0 +1,76 @@
+'''
+remember to install 2 libraries before running the code
+pip3 install Adafruit-SSD1306
+pip3 install Pillow
+'''
+import time
+import Adafruit_SSD1306
+from PIL import Image, ImageDraw, ImageFont
+
+import RPi.GPIO as GPIO
+import dht11
+
+from time import sleep
+
+# initialize GPIO
+GPIO.setwarnings(False)
+GPIO.setmode(GPIO.BCM)
+GPIO.cleanup()
+
+# read data using pin 14
+instance = dht11.DHT11(pin = 4)
+result = instance.read()
+
+# Raspberry Pi pin configuration:
+RST = None  # on the PiOLED this pin isn't used
+# Note the following are only used with SPI:
+DC = 23
+SPI_PORT = 0
+SPI_DEVICE = 0
+
+# 128x32 display with hardware I2C:
+disp = Adafruit_SSD1306.SSD1306_128_32(rst=RST)
+
+# Initialize library.
+disp.begin()
+
+# Clear display.
+disp.clear()
+disp.display()
+
+# Create blank image for drawing.
+width = disp.width
+height = disp.height
+image = Image.new('1', (width, height))
+
+# Get drawing object to draw on image.
+draw = ImageDraw.Draw(image)
+font = ImageFont.load_default()
+
+# Display a single line of text.
+
+
+# Display image.
+def clearpic():
+    draw.rectangle((0, 0, width, height), outline=0, fill=0)
+
+
+while 1:
+    if result.is_valid():
+        result = instance.read()
+        print("Temperature: %-3.1f C" % result.temperature)
+        print("Humidity: %-3.1f %%" % result.humidity)
+        text_temp = "Temperature: %-3.1f C" % result.temperature
+        text_humi = "Humidity: %-3.1f %%" % result.humidity
+        if text_temp == 0 or text_humi == 0:
+            continue;
+        #send_cloud(text_humi)
+        draw.text((0, 0), text_temp, font=font, fill=255)
+        draw.text((0, 10), text_humi, font=font, fill=255)
+        disp.image(image)
+        disp.display()
+    else:
+        print("Error: %d" % result.error_code)
+    time.sleep(5)
+    disp.clear()
+    clearpic()

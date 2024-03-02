@@ -1,0 +1,14 @@
+1.connect to the pi using a type c cable
+
+2.sharing the internet to pi:
+	close ipv6 for pi
+	share internet connection with pi
+	(maybe only available with the internet wire)
+
+3.connecting pi to a particular wifi network
+	use sudo raspi-config to set wifi connection for pi
+	choose Network Options
+	enter name and pw
+	use ip a to check if it is connected
+	sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
+     	use for checking the network configration
